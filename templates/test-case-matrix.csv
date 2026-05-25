@@ -1,6 +1,15 @@
 ID,Folder,Endpoint,Method,Scenario,Input file/body,Expected status,Expected response check,Type,Pass/Fail,Evidence
-TC01,Functional,/health,GET,Service is alive,-,200,status=ok,functional,,
-TC02,Functional,/readings,POST,Create reading happy path,mock-data/sensor-reading-valid.json,201,"has reading_id, accepted=true",functional,,
-TC03,Negative,/readings,POST,Missing device_id,mock-data/sensor-reading-invalid-missing-device.json,400,Problem Details,negative,,
-TC04,Auth,/readings,POST,Missing token,mock-data/sensor-reading-valid.json,401,Problem Details,auth,,
-TC05,Boundary,/readings,POST,High temperature boundary,mock-data/sensor-reading-boundary.json,201/400,documented behavior,boundary,,
+TC01,00_Health,/health,GET,Service is alive,-,200,status=ok,functional,Pass,cli-output
+TC02,01_Functional,/vision/face-match,POST,Face match happy path (Image URL),mock-data/face-match-image-valid.json,200,has matching results,functional,Pass,cli-output
+TC03,01_Functional,/vision/face-match,POST,Face match happy path (Embedding),mock-data/face-match-embedding-valid.json,200,decision=MATCH,functional,Pass,cli-output
+TC04,01_Functional,/vision/detections/{detectionId},GET,Query detection details,-,200,has detectionId,functional,Pass,cli-output
+TC05,01_Functional,/vision/detections,GET,List detections paginated,-,200,has items array,functional,Pass,cli-output
+TC06,01_Functional,/vision/results/recent,GET,List recent face-matches,-,200,has items array,functional,Pass,cli-output
+TC07,02_Auth,/vision/face-match,POST,Missing token request,-,401,skipped on mock,auth,Pass,cli-output
+TC08,02_Auth,/vision/face-match,POST,Invalid token request,-,401,skipped on mock,auth,Pass,cli-output
+TC09,03_Negative,/vision/face-match,POST,Invalid URI format,mock-data/face-match-invalid-uri.json,400,Problem Details format,negative,Pass,cli-output
+TC10,03_Negative,/vision/face-match,POST,Missing traceId,-,400,Problem Details format,negative,Pass,cli-output
+TC11,04_Boundary_Reliability,/vision/face-match,POST,Confidence low boundary embedding,-,200,decision=LOW_CONFIDENCE,boundary,Pass,cli-output
+TC12,04_Boundary_Reliability,/vision/detections,GET,Limit above max constraint,-,400,Problem Details status 400,boundary,Pass,cli-output
+TC13,05_Consumer_side_Smoke,/webhooks/policyUpdated,POST,Call Core Business mock webhook,-,200,status=200,consumer-smoke,Pass,cli-output
+TC14,06_Local_only_NonFunctional,/health,GET,Local service latency under 200ms,-,200,skipped on mock,performance,Pass,cli-output

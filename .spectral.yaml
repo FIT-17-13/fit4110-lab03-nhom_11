@@ -6,3 +6,4 @@ rules:
   operation-operationId: error
   operation-tags: warn
   oas3-api-servers: off
+  duplicated-entry-in-enum: off

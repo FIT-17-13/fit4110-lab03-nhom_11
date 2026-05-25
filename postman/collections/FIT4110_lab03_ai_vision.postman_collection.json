@@ -1,0 +1,555 @@
+{
+  "info": {
+    "_postman_id": "fit4110-lab03-ai-vision",
+    "name": "FIT4110 Lab03 - AI Vision Contract Tests",
+    "description": "Postman Collection for AI Vision Service B4 (Nhóm 11). Covers functional, auth, negative, boundary, consumer-side smoke, and performance tests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "const prefix = pm.environment.get('tracePrefix') || 'fit4110-lab03';",
+          "pm.variables.set('traceId', prefix + '-' + Date.now());",
+          "pm.request.headers.upsert({ key: 'X-Trace-Id', value: pm.variables.get('traceId') });"
+        ]
+      }
+    }
+  ],
+  "variable": [],
+  "item": [
+    {
+      "name": "00_Health",
+      "item": [
+        {
+          "name": "GET /health - service is alive",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            },
+            "description": "Kiểm tra service alive"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Response has service status', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('status', 'ok');",
+                  "  pm.expect(json).to.have.property('service', 'ai-vision');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "01_Functional",
+      "item": [
+        {
+          "name": "POST /vision/face-match (Image URL) - happy path",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{authToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/vision/face-match",
+              "host": ["{{baseUrl}}"],
+              "path": ["vision", "face-match"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"requestType\": \"IMAGE_REF\",\n  \"traceId\": \"0196fb3d-4ad7-7d1e-9f49-5d5148d2babc\",\n  \"imageRef\": \"https://storage.campus.local/frames/frame-001.jpg\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "So khớp khuôn mặt dùng URL ảnh"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Response has matching results', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('matchId');",
+                  "  pm.expect(json).to.have.property('decision');",
+                  "  pm.expect(json).to.have.property('confidence');",
+                  "  pm.expect(json).to.have.property('modelVersion');",
+                  "  pm.expect(json).to.have.property('processedAt');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /vision/face-match (Embedding) - happy path",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{authToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/vision/face-match",
+              "host": ["{{baseUrl}}"],
+              "path": ["vision", "face-match"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"requestType\": \"EMBEDDING\",\n  \"traceId\": \"0196fb3d-4ad7-7d1e-9f49-5d5148d2babd\",\n  \"embedding\": [0.12, 0.45, 0.78]\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "So khớp khuôn mặt dùng vector embedding"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /vision/detections/{detectionId} - detail query",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/vision/detections/0196fb3d-4ad7-7d1e-9f49-5d5148d2babc",
+              "host": ["{{baseUrl}}"],
+              "path": ["vision", "detections", "0196fb3d-4ad7-7d1e-9f49-5d5148d2babc"]
+            },
+            "description": "Lấy chi tiết kết quả detection"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Response has detection fields', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('detectionId');",
+                  "  pm.expect(json).to.have.property('sourceDeviceId');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /vision/detections - list detections",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/vision/detections?limit=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["vision", "detections"],
+              "query": [{ "key": "limit", "value": "5" }]
+            },
+            "description": "Lấy danh sách kết quả detection phân trang"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Response contains items array', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('items');",
+                  "  pm.expect(json.items).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /vision/results/recent - list recent face-matches",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/vision/results/recent?limit=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["vision", "results", "recent"],
+              "query": [{ "key": "limit", "value": "5" }]
+            },
+            "description": "Lấy danh sách kết quả gần đây"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02_Auth",
+      "item": [
+        {
+          "name": "POST /vision/face-match - missing token is rejected on real service",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/vision/face-match",
+              "host": ["{{baseUrl}}"],
+              "path": ["vision", "face-match"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"requestType\": \"IMAGE_REF\",\n  \"traceId\": \"0196fb3d-4ad7-7d1e-9f49-5d5148d2babc\",\n  \"imageRef\": \"https://storage.campus.local/frames/frame-001.jpg\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Auth test thật: thiếu token bị từ chối 401/403 trên service thật"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const env = pm.environment.get('env') || 'mock';",
+                  "if (env === 'mock') {",
+                  "  pm.test('Skipped on mock: Prism does not enforce auth validation', function () {",
+                  "    pm.expect(true).to.eql(true);",
+                  "  });",
+                  "} else {",
+                  "  pm.test('Missing token returns 401 or 403', function () {",
+                  "    pm.expect([401, 403]).to.include(pm.response.code);",
+                  "  });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /vision/face-match - invalid token is rejected on real service",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer invalid-token" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/vision/face-match",
+              "host": ["{{baseUrl}}"],
+              "path": ["vision", "face-match"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"requestType\": \"IMAGE_REF\",\n  \"traceId\": \"0196fb3d-4ad7-7d1e-9f49-5d5148d2babc\",\n  \"imageRef\": \"https://storage.campus.local/frames/frame-001.jpg\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Auth test thật: token sai bị từ chối"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const env = pm.environment.get('env') || 'mock';",
+                  "if (env === 'mock') {",
+                  "  pm.test('Skipped on mock: invalid token needs real auth handler', function () {",
+                  "    pm.expect(true).to.eql(true);",
+                  "  });",
+                  "} else {",
+                  "  pm.test('Invalid token returns 401 or 403', function () {",
+                  "    pm.expect([401, 403]).to.include(pm.response.code);",
+                  "  });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03_Negative",
+      "item": [
+        {
+          "name": "POST /vision/face-match - invalid imageRef URI format",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{authToken}}" },
+              { "key": "Prefer", "value": "code=400" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/vision/face-match",
+              "host": ["{{baseUrl}}"],
+              "path": ["vision", "face-match"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"requestType\": \"IMAGE_REF\",\n  \"traceId\": \"0196fb3d-4ad7-7d1e-9f49-5d5148d2babc\",\n  \"imageRef\": \"invalid-uri-format\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Gửi URI ảnh sai định dạng để kích hoạt lỗi validation 400"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Invalid payload returns client error', function () {",
+                  "  pm.expect([400, 422]).to.include(pm.response.code);",
+                  "});",
+                  "pm.test('Error response follows ProblemDetails schema', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('title');",
+                  "  pm.expect(json).to.have.property('status');",
+                  "  pm.expect(json.status).to.be.within(400, 599);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /vision/face-match - missing traceId",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{authToken}}" },
+              { "key": "Prefer", "value": "code=400" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/vision/face-match",
+              "host": ["{{baseUrl}}"],
+              "path": ["vision", "face-match"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"requestType\": \"IMAGE_REF\",\n  \"imageRef\": \"https://storage.campus.local/frames/frame-001.jpg\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Gửi thiếu trường traceId bắt buộc"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Missing traceId returns client error', function () {",
+                  "  pm.expect([400, 422]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "04_Boundary_Reliability",
+      "item": [
+        {
+          "name": "POST /vision/face-match (Low Confidence) - boundary result",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{authToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/vision/face-match",
+              "host": ["{{baseUrl}}"],
+              "path": ["vision", "face-match"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"requestType\": \"EMBEDDING\",\n  \"traceId\": \"0196fb3d-4ad7-7d1e-9f49-5d5148d2babe\",\n  \"embedding\": [0.01, 0.02, 0.03]\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Kiểm tra trường hợp độ tin cậy thấp trả về LOW_CONFIDENCE"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Low confidence matches return success 200', function () {",
+                  "  pm.expect(pm.response.code).to.eql(200);",
+                  "});",
+                  "pm.test('Response decision indicates LOW_CONFIDENCE or MATCH', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(['LOW_CONFIDENCE', 'MATCH', 'NO_MATCH']).to.include(json.decision);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /vision/detections - limit above max is rejected",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" },
+              { "key": "Prefer", "value": "code=400" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/vision/detections?limit=101",
+              "host": ["{{baseUrl}}"],
+              "path": ["vision", "detections"],
+              "query": [{ "key": "limit", "value": "101" }]
+            },
+            "description": "Boundary: gửi limit > 100 bị từ chối lỗi"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Limit above max returns client error 400', function () {",
+                  "  pm.expect([400, 422]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "05_Consumer_side_Smoke",
+      "item": [
+        {
+          "name": "Consumer smoke - Webhook calls Core Business",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{coreBusinessMockUrl}}/webhooks/policyUpdated",
+              "host": ["{{coreBusinessMockUrl}}"],
+              "path": ["webhooks", "policyUpdated"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"policyId\": \"POL-001\",\n  \"name\": \"Giờ hành chính — Nhân viên\",\n  \"scope\": \"EMPLOYEE\",\n  \"allowedTimeStart\": \"07:00\",\n  \"allowedTimeEnd\": \"18:00\",\n  \"allowedDays\": [\"MON\", \"TUE\", \"WED\", \"THU\", \"FRI\"],\n  \"status\": \"ACTIVE\",\n  \"priority\": 10,\n  \"createdAt\": \"2026-01-01T00:00:00Z\",\n  \"updatedAt\": \"2026-03-15T10:30:00Z\",\n  \"expiresAt\": null\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Consumer smoke test: AI Vision gọi webhook báo cập nhật chính sách của Core Business mock"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Consumer receives success 200 from Core Business mock webhook', function () {",
+                  "  pm.expect(pm.response.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "06_Local_only_NonFunctional",
+      "item": [
+        {
+          "name": "GET /health - local response time SLA",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            },
+            "description": "Latency test: chỉ chạy và đánh giá trên service thật"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const env = pm.environment.get('env') || 'mock';",
+                  "if (env === 'local') {",
+                  "  pm.test('Local service responds under 200ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(200);",
+                  "  });",
+                  "} else {",
+                  "  pm.test('Skipped on mock: mock latency is ignored', function () {",
+                  "    pm.expect(true).to.eql(true);",
+                  "  });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

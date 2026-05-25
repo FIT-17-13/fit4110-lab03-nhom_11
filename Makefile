@@ -6,13 +6,13 @@ install:
 lint:
 	npm run lint:contracts
 
-mock: mock-iot
-
-mock-iot:
-	npm run mock:iot
+mock: mock-vision
 
 mock-vision:
 	npm run mock:vision
+
+mock-core:
+	npm run mock:core
 
 mock-all:
 	npm run mock:all
