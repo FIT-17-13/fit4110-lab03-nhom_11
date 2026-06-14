@@ -1,4 +1,4 @@
-.PHONY: install lint mock mock-iot mock-vision mock-all test-mock test-local test-html test-ci clean
+.PHONY: install lint mock mock-vision mock-core mock-all test-mock test-local test-html test-ci clean
 
 install:
 	npm install

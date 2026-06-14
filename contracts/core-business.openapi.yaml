@@ -121,6 +121,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '422':
           $ref: '#/components/responses/UnprocessableEntity'
         '500':
@@ -281,6 +283,8 @@ paths:
     post:
       operationId: mockOnPolicyUpdated
       summary: Mock endpoint for webhook
+      description: Endpoint mock de consumer kiem tra viec nhan su kien cap nhat policy tu Core Business.
+      tags: [policies]
       security: []
       requestBody:
         required: true

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="FIT4110 Lab03 - AI Vision Contract Tests" tests="14" time="0.186">
+  <testsuite name="00_Health / GET /health - service is alive" id="913e3def-ddbd-4308-af56-3de070181ec7" timestamp="2026-06-14T17:56:13.307Z" tests="2" failures="0" errors="0" time="0.025">
+    <testcase name="Status code is 200" time="0.025" classname="00HealthGetHealthServiceIsAlive"/>
+    <testcase name="Response has service status" time="0.025" classname="00HealthGetHealthServiceIsAlive"/>
+  </testsuite>
+  <testsuite name="01_Functional / POST /vision/face-match (Image URL) - happy path" id="a8702461-9ea9-414e-8003-51fc70ad9dca" timestamp="2026-06-14T17:56:13.307Z" tests="2" failures="0" errors="0" time="0.021">
+    <testcase name="Status code is 200" time="0.021" classname="01FunctionalPostVisionFaceMatchImageUrlHappyPath"/>
+    <testcase name="Response has matching results" time="0.021" classname="01FunctionalPostVisionFaceMatchImageUrlHappyPath"/>
+  </testsuite>
+  <testsuite name="01_Functional / POST /vision/face-match (Embedding) - happy path" id="3b092637-c1c1-425b-874d-26a5238f5f73" timestamp="2026-06-14T17:56:13.307Z" tests="1" failures="0" errors="0" time="0.007">
+    <testcase name="Status code is 200" time="0.007" classname="01FunctionalPostVisionFaceMatchEmbeddingHappyPath"/>
+  </testsuite>
+  <testsuite name="01_Functional / GET /vision/detections/{detectionId} - detail query" id="4f231261-f50b-4328-a832-35919fdfa99b" timestamp="2026-06-14T17:56:13.307Z" tests="2" failures="0" errors="0" time="0.026">
+    <testcase name="Status code is 200" time="0.026" classname="01FunctionalGetVisionDetectionsDetectionIdDetailQuery"/>
+    <testcase name="Response has detection fields" time="0.026" classname="01FunctionalGetVisionDetectionsDetectionIdDetailQuery"/>
+  </testsuite>
+  <testsuite name="01_Functional / GET /vision/detections - list detections" id="810252ca-d7f9-4479-bad7-4dc1728f5082" timestamp="2026-06-14T17:56:13.307Z" tests="2" failures="0" errors="0" time="0.020">
+    <testcase name="Status code is 200" time="0.020" classname="01FunctionalGetVisionDetectionsListDetections"/>
+    <testcase name="Response contains items array" time="0.020" classname="01FunctionalGetVisionDetectionsListDetections"/>
+  </testsuite>
+  <testsuite name="01_Functional / GET /vision/results/recent - list recent face-matches" id="32c19712-6337-4ad2-a281-d42f4d6690fe" timestamp="2026-06-14T17:56:13.307Z" tests="1" failures="0" errors="0" time="0.015">
+    <testcase name="Status code is 200" time="0.015" classname="01FunctionalGetVisionResultsRecentListRecentFaceMatches"/>
+  </testsuite>
+  <testsuite name="02_Auth / POST /vision/face-match - missing token is rejected on real service" id="7bb3ab98-e1b8-4d1b-b330-4493e5cf2317" timestamp="2026-06-14T17:56:13.307Z" tests="1" failures="0" errors="0" time="0.016">
+    <testcase name="Skipped on mock: Prism does not enforce auth validation" time="0.016" classname="02AuthPostVisionFaceMatchMissingTokenIsRejectedOnRealService"/>
+  </testsuite>
+  <testsuite name="02_Auth / POST /vision/face-match - invalid token is rejected on real service" id="24fd8ed9-d7a9-4745-865c-d32f9948b0b0" timestamp="2026-06-14T17:56:13.307Z" tests="1" failures="0" errors="0" time="0.006">
+    <testcase name="Skipped on mock: invalid token needs real auth handler" time="0.006" classname="02AuthPostVisionFaceMatchInvalidTokenIsRejectedOnRealService"/>
+  </testsuite>
+  <testsuite name="03_Negative / POST /vision/face-match - invalid imageRef URI format" id="3f9a6b7d-7b91-4b2d-8898-5db712de9b90" timestamp="2026-06-14T17:56:13.307Z" tests="2" failures="0" errors="0" time="0.014">
+    <testcase name="Invalid payload returns client error" time="0.014" classname="03NegativePostVisionFaceMatchInvalidImageRefUriFormat"/>
+    <testcase name="Error response follows ProblemDetails schema" time="0.014" classname="03NegativePostVisionFaceMatchInvalidImageRefUriFormat"/>
+  </testsuite>
+  <testsuite name="03_Negative / POST /vision/face-match - missing traceId" id="e14d5ef6-aed7-4d31-ab08-47a269e7b147" timestamp="2026-06-14T17:56:13.307Z" tests="1" failures="0" errors="0" time="0.006">
+    <testcase name="Missing traceId returns client error" time="0.006" classname="03NegativePostVisionFaceMatchMissingTraceId"/>
+  </testsuite>
+  <testsuite name="04_Boundary_Reliability / POST /vision/face-match (Low Confidence) - boundary result" id="d4025edf-9176-45d3-8399-06cbff529c64" timestamp="2026-06-14T17:56:13.307Z" tests="2" failures="0" errors="0" time="0.005">
+    <testcase name="Low confidence matches return success 200" time="0.005" classname="04BoundaryReliabilityPostVisionFaceMatchLowConfidenceBoundaryResult"/>
+    <testcase name="Response decision indicates LOW_CONFIDENCE or MATCH" time="0.005" classname="04BoundaryReliabilityPostVisionFaceMatchLowConfidenceBoundaryResult"/>
+  </testsuite>
+  <testsuite name="04_Boundary_Reliability / GET /vision/detections - limit above max is rejected" id="19928d45-e4c4-47d8-b332-b19b2a5c855d" timestamp="2026-06-14T17:56:13.307Z" tests="1" failures="0" errors="0" time="0.004">
+    <testcase name="Limit above max returns client error 400" time="0.004" classname="04BoundaryReliabilityGetVisionDetectionsLimitAboveMaxIsRejected"/>
+  </testsuite>
+  <testsuite name="05_Consumer_side_Smoke / Consumer smoke - Webhook calls Core Business" id="cb18a5c3-e14b-4a13-b1a9-915490d77fbc" timestamp="2026-06-14T17:56:13.307Z" tests="1" failures="0" errors="0" time="0.014">
+    <testcase name="Consumer receives success 200 from Core Business mock webhook" time="0.014" classname="05ConsumerSideSmokeConsumerSmokeWebhookCallsCoreBusiness"/>
+  </testsuite>
+  <testsuite name="06_Local_only_NonFunctional / GET /health - local response time SLA" id="e3aae560-0bb0-4c5b-bf75-e5ce40c9439a" timestamp="2026-06-14T17:56:13.307Z" tests="1" failures="0" errors="0" time="0.007">
+    <testcase name="Skipped on mock: mock latency is ignored" time="0.007" classname="06LocalOnlyNonFunctionalGetHealthLocalResponseTimeSla"/>
+  </testsuite>
+</testsuites>
